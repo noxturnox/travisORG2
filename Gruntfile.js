@@ -6,7 +6,11 @@ module.exports = function (grunt) {
     global.storesAsso = [];
     global.arrayTasksDeploy = [];
     global.changed_theme_files = [];
-    global.lastRelease = 0;
+    global.branchRelease = '';
+    function devReleaseLog(error, stdout, stderr, callback){
+        global.branchRelease = stdout;
+        callback();
+    }
     function jslintlog(error, stdout, stderr, callback){
         if(stdout!=''){
             grunt.log.error();
@@ -17,12 +21,13 @@ module.exports = function (grunt) {
         callback();
     }
     function getLastReleaselog(error, stdout, stderr, callback){
-        global.lastRelease = stdout.substring('/\..*/'.length);
-        let tempnumber = parseInt(global.lastRelease);
-        tempnumber += 1; 
-        global.lastRelease = stdout;
-        global.lastRelease = global.lastRelease.substring(0,global.lastRelease.lastIndexOf('.')+1)+tempnumber
-        grunt.task.run('shell:createTag:'+global.lastRelease)
+        global.branchRelease = stdout
+        //global.lastRelease = stdout.substring('/\..*/'.length);
+        //let tempnumber = parseInt(global.lastRelease);
+        //tempnumber += 1; 
+        //global.lastRelease = stdout;
+        //global.lastRelease = global.lastRelease.substring(0,global.lastRelease.lastIndexOf('.')+1)+tempnumber
+        //grunt.task.run('shell:createTag:'+global.lastRelease)
         callback();
     }
     function handleLastCommitDifferences(error, stdout, stderr, callback) {
@@ -210,7 +215,7 @@ module.exports = function (grunt) {
                 },
             },
             temporalBranch: { 
-                command: [`git checkout -b temporal $(git tag | tail -1) >/dev/null 2>&1`,
+                command: devBranch => [`git checkout -b temporal ${devBranch} >/dev/null 2>&1`,
                 `grunt cpCommonFilesToRespectiveStores`,
                 `./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
                 options: {
@@ -271,7 +276,7 @@ module.exports = function (grunt) {
             getLastRelease: {
                 command: [`git checkout ${process.env.TRAVIS_BRANCH} >/dev/null 2>&1`,`git fetch --tags >/dev/null 2>&1`, `git tag | tail -1`].join(' && '),
                 options: {
-                    //callback: getLastReleaselog,
+                    callback: getLastReleaselog,
                     stdout: false,
                 }
             },
@@ -294,6 +299,13 @@ module.exports = function (grunt) {
                     callback: jslintlog,
                     stdout: false,
                 },
+            },
+            devRelease: {
+                command: [`git checkout ${process.env.TRAVIS_BRANCH} >/dev/null 2>&1`,`git fetch --tags >/dev/null 2>&1`,`git tag | grep pre | tail -1`].join(' && ' ),
+                options: {
+                    callback: devReleaseLog,
+                    stdout: false,
+                }
             },
         }
     })
@@ -403,7 +415,7 @@ module.exports = function (grunt) {
             grunt.log.writeln();
             grunt.log.write(('  Running PRETTIER: '))
         })
-        .run('shell:temporalBranch').then( ()=>{
+        .run('shell:temporalBranch:'+global.branchRelease).then( ()=>{
             grunt.log.ok();
             grunt.log.write(('  Running JSON-Format: '));
         })
@@ -489,7 +501,12 @@ module.exports = function (grunt) {
     })
     grunt.registerTask('getLastCommitDifferences', 'shell:get_last_commit_differences')
     grunt.registerTask('generateRelease',function(){
-        grunt.task.run('shell:getLastRelease')
+        if($process.env.TRAVIS_BRANCH == 'develop'){
+            grunt.task.run('shell:devRelease')
+        }else {
+            grunt.task.run('shell:getLastRelease')
+        }
+        
     })
     grunt.registerTask('cpCommonFilesToRespectiveStores',function(){
         var tempYAML = grunt.file.readYAML('config.yml');
