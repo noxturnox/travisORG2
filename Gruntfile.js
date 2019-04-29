@@ -9,6 +9,7 @@ module.exports = function (grunt) {
     global.branchRelease = '';
     function devReleaseLog(error, stdout, stderr, callback){
         global.branchRelease = stdout;
+        console.log(global.branchRelease)
         callback();
     }
     function jslintlog(error, stdout, stderr, callback){
@@ -22,6 +23,7 @@ module.exports = function (grunt) {
     }
     function getLastReleaselog(error, stdout, stderr, callback){
         global.branchRelease = stdout
+        console.log(branchRelease)
         //global.lastRelease = stdout.substring('/\..*/'.length);
         //let tempnumber = parseInt(global.lastRelease);
         //tempnumber += 1; 
@@ -216,8 +218,7 @@ module.exports = function (grunt) {
             },
             temporalBranch: { 
                 command: devBranch => [`git checkout -b temporal ${devBranch} >/dev/null 2>&1`,
-                `grunt cpCommonFilesToRespectiveStores`,
-                `./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
+                `grunt cpCommonFilesToRespectiveStores`,`./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
                 options: {
                     stdout: false,
                 }
@@ -501,7 +502,6 @@ module.exports = function (grunt) {
     })
     grunt.registerTask('getLastCommitDifferences', 'shell:get_last_commit_differences')
     grunt.registerTask('generateRelease',function(){
-        console.log(process.env.TRAVIS_BRANCH)
         if(process.env.TRAVIS_BRANCH == 'develop'){
             grunt.task.run('shell:devRelease')
         }else {
