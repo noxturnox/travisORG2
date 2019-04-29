@@ -1,0 +1,23 @@
+common-files:
+    massiveshops, littleshops:
+        ['templates/404.liquid','templates/blog.liquid']
+    littleshops:
+        ['templates/article.liquid']
+massiveshops:
+    develop:
+        password: '$massiveshops_pass'
+        theme_id: '$massiveshops_dev'
+        store: '$massiveshops_store_url'
+    master:
+        password: '$massiveshops_pass'
+        theme_id: '$massiveshops_master'
+        store: '$massiveshops_store_url'
+littleshops:
+    develop:
+        password: '$littleshops_pass'
+        theme_id: '$littleshops_dev'
+        store: '$littleshops_store_url'
+    master:
+        password: '$littleshops_pass'
+        theme_id: '$littleshops_master'
+        store: '$littleshops_store_url'

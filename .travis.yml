@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+    - lts/*
+install:
+    - npm ci
+if: tag IS blank
+addons:
+  apt:
+    packages:
+      - expect-dev
+before_script:
+    - npm install python
+    - npm install grunt-cli -g
+    - curl -s https://shopify.github.io/themekit/scripts/install.py | sudo python
+script:
+    - files=$(git diff HEAD^ HEAD --name-only | grep "store" | cat)
+    - |
+      if [[ ($TRAVIS_BRANCH == 'develop' || $TRAVIS_BRANCH == 'master') && ("$files" != '') ]]; then
+        unbuffer grunt;
+      else
+        unbuffer grunt dev;
+      fi

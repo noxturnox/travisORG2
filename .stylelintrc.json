@@ -1,0 +1,17 @@
+{
+  "extends": "stylelint-config-recommended",
+  "rules": {
+    "at-rule-no-unknown": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "font-family-no-missing-generic-family-keyword": null,
+    "unit-no-unknown": null,
+    "function-linear-gradient-no-nonstandard-direction": null,
+    "block-no-empty": null,
+    "declaration-block-no-duplicate-properties": null,
+    "font-family-no-duplicate-names": null,
+    "media-feature-name-no-unknown": null,
+    "comment-no-empty": null,
+    "declaration-block-no-shorthand-property-overrides": null
+  }
+}

@@ -1,0 +1,17 @@
+*.liquid
+*.gif
+*.svg
+*.png
+*.jpg
+.eslintrc.js
+.prettierignore
+.prettierrc.js
+.travis.yml
+config.yml
+Gruntfile.js
+.gitignore
+archivos.txt
+*.eot
+*.ttf
+*.woff
+.env
