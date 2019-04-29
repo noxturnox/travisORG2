@@ -501,8 +501,8 @@ module.exports = function (grunt) {
     })
     grunt.registerTask('getLastCommitDifferences', 'shell:get_last_commit_differences')
     grunt.registerTask('generateRelease',function(){
-        console.log(TRAVIS_BRANCH)
-        if(TRAVIS_BRANCH == 'develop'){
+        console.log(process.env.TRAVIS_BRANCH)
+        if(process.env.TRAVIS_BRANCH == 'develop'){
             grunt.task.run('shell:devRelease')
         }else {
             grunt.task.run('shell:getLastRelease')
