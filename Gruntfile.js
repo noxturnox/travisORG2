@@ -233,7 +233,7 @@ module.exports = function (grunt) {
                 },
             },
             downloadingTheme: {
-                command: store => [`cd stores/${store}`,`theme download --env=${process.env.TRAVIS_BRANCH}`].join(' && '),
+                command: (store,environment) => [`cd stores/${store}`,`theme download --env=${environment}`].join(' && '),
                 options: {
                     stdout: false,
                     stderr: false,
@@ -347,7 +347,7 @@ module.exports = function (grunt) {
             }else {
                 grunt.log.ok();
             } 
-            grunt.log.write('  Exists '+shopName+' develop and master enviroments: ')
+            grunt.log.write('  Exists '+shopName+' develop and master environments: ')
             if (shopsArray[shopName]['develop']&&shopsArray[shopName]['master']){
                 grunt.log.ok();
             }
@@ -427,6 +427,11 @@ module.exports = function (grunt) {
         .run(global.arrayTasksStores)
     })
     grunt.registerTask('tasksForEachStore', function(storeName){
+        if(process.env.TRAVIS_BRANCH == 'develop' || process.env.TRAVIS_BRANCH == 'master'){
+            tempEnvironment = process.env.TRAVIS_BRANCH;
+        }else{
+            tempEnvironment = 'develop';
+        }
                 grunt.log.writeln()
                 grunt.log.writeln((('\t\t\t\tWorking on SHOP: '+storeName).toUpperCase())['green'].bold)
                 grunt.log.writeln();
@@ -434,7 +439,7 @@ module.exports = function (grunt) {
                 grunt.log.writeln();
                 grunt.log.write('  Downloading Theme: ')
                 grunt.task
-            .run('shell:downloadingTheme:'+storeName).then(()=>{
+            .run('shell:downloadingTheme:'+storeName+':'+tempEnvironment).then(()=>{
                 grunt.log.ok();
                 grunt.log.write('  Running PRETTIER: ')
             })
