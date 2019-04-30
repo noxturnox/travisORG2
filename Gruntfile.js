@@ -504,7 +504,12 @@ module.exports = function (grunt) {
     grunt.registerTask('pushNewTag',function(){
         console.log('Last Release: '+global.branchRelease)
         newRelease = '';
-        let tempnumber = parseInt(global.branchRelease.substring('/[0-9]+$/'.length));
+        let tempnumber = 0;
+        if(global.branchRelease.startsWith('pre')){
+            tempnumber = parseInt(global.branchRelease.substring('/[0-9]+$/'.length));
+        }else{
+            tempnumber = parseInt(global.branchRelease.substring('/\..*/'.length));
+        }
         console.log('Last digit: '+tempnumber)
         tempnumber += 1; 
         console.log('Last digit +1:'+tempnumber)
