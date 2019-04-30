@@ -1,0 +1,9 @@
+
+develop:
+  password: $massiveshops_pass
+  theme_id: $massiveshops_dev
+  store: $massiveshops_store_url
+master:
+  password: $massiveshops_pass
+  theme_id: $massiveshops_master
+  store: $massiveshops_store_url
