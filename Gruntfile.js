@@ -210,7 +210,7 @@ module.exports = function (grunt) {
                 },
             },
             temporalBranch: { 
-                command: devBranch => [`git checkout -b temporal ${devBranch} >/dev/null 2>&1`,
+                command: devBranch => [`git checkout -b temporal ${devBranch}`,
                 `grunt cpCommonFilesToRespectiveStores`,`./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
                 options: {
                     stdout: false,
@@ -409,7 +409,7 @@ module.exports = function (grunt) {
             grunt.log.writeln();
             grunt.log.write(('  Running PRETTIER: '))
         })
-        .run('shell:temporalBranch:'+global.branchRelease).then( ()=>{
+        .run('shell:temporalBranch:'+global.branchRelease+' >/dev/null 2>&1').then( ()=>{
             grunt.log.ok();
             grunt.log.write(('  Running JSON-Format: '));
         })
