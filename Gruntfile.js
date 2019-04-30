@@ -274,7 +274,7 @@ module.exports = function (grunt) {
                 }
             },
             createTag: {
-                command: tagname => [`git checkout ${process.env.TRAVIS_BRANCH}`,`git tag -a ${tagname} -m "Release of version ${tagname}`].join(' && '),
+                command: tagname => [`git checkout ${process.env.TRAVIS_BRANCH}`,`git tag -a ${tagname} -m "Release of version ${tagname}"`].join(' && '),
                 options: {
                     stdout: false,
                 },
@@ -502,7 +502,7 @@ module.exports = function (grunt) {
         
     })
     grunt.registerTask('pushNewTag',function(){
-        grunt.log.writeln(('Last Release: '+global.branchRelease)['magenta'].bold)
+        grunt.log.write(('Last Release: '+global.branchRelease)['magenta'].bold)
         newRelease = '';
         let tempnumber = 0;
         if(global.branchRelease.startsWith('pre')){
