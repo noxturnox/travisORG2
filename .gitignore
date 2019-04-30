@@ -1,2 +1,4 @@
 node_modules/
 .env
+arrayTasksDeployFile
+./stores/**/config.yml
