@@ -509,10 +509,10 @@ module.exports = function (grunt) {
     })
     grunt.registerTask('getLastCommitDifferences', 'shell:get_last_commit_differences')
     grunt.registerTask('getLastReleaseFromRepo',function(){
-        if(process.env.TRAVIS_BRANCH == 'develop'){
-            grunt.task.run('shell:devRelease')
-        }else {
+        if(process.env.TRAVIS_BRANCH == 'master'){
             grunt.task.run('shell:getLastRelease')
+        }else {
+            grunt.task.run('shell:devRelease')
         }
         
     })
