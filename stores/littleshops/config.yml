@@ -1,0 +1,9 @@
+
+develop:
+  password: $littleshops_pass
+  theme_id: $littleshops_dev
+  store: $littleshops_store_url
+master:
+  password: $littleshops_pass
+  theme_id: $littleshops_master
+  store: $littleshops_store_url
