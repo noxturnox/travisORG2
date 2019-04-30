@@ -281,7 +281,7 @@ module.exports = function (grunt) {
                 },
             },
             pushTag: {
-                command: tag => `git push "https://noxturnox:${process.env.TRAVISTOKEN}@${process.env.REPO}" ${tag}`,
+                command: tag => `git push "https://noxturnox:${process.env.GITHUBTOKEN}@${process.env.REPO}" ${tag}`,
             },
             cleaning: {
                 command: [`git add .`,`git commit -m "cleaning"`,`git checkout ${process.env.TRAVIS_BRANCH}`,
