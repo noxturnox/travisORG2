@@ -9,7 +9,6 @@ module.exports = function (grunt) {
     global.branchRelease = '';
     function devReleaseLog(error, stdout, stderr, callback){
         global.branchRelease = stdout;
-        //console.log(global.branchRelease)
         callback();
     }
     function jslintlog(error, stdout, stderr, callback){
@@ -210,7 +209,7 @@ module.exports = function (grunt) {
                 },
             },
             temporalBranch: { 
-                command: devBranch => [`git checkout -b temporal ${devBranch}`,
+                command: devBranch => [`git checkout -b temporal ${devBranch} >/dev/null`,
                 `grunt cpCommonFilesToRespectiveStores`,`./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
                 options: {
                     stdout: false,
@@ -304,7 +303,7 @@ module.exports = function (grunt) {
         }
     })
 
-    grunt.registerTask('default', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','pushNewTag','shell:cleaning']) 
+    grunt.registerTask('default', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
     grunt.registerTask('dev', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme']) //,'csslint','prettier','js-lint'
     //,'cpCommonFilesToRespectiveStores'          al principio 'generateRelease',           al final ,'shell:pushTag'   ,'theme_lint'
     grunt.registerTask('createYAMLFileOnEachShop', function () {
@@ -409,7 +408,7 @@ module.exports = function (grunt) {
             grunt.log.writeln();
             grunt.log.write(('  Running PRETTIER: '))
         })
-        .run('shell:temporalBranch:'+global.branchRelease+' >/dev/null 2>&1').then( ()=>{
+        .run('shell:temporalBranch:'+global.branchRelease).then( ()=>{
             grunt.log.ok();
             grunt.log.write(('  Running JSON-Format: '));
         })
@@ -503,15 +502,10 @@ module.exports = function (grunt) {
         
     })
     grunt.registerTask('pushNewTag',function(){
-        //global.branchRelease = stdout.substring('/\..*/'.length);
         newRelease = '';
-        //global.branchRelease = 'pre-v0.0.1'
-        //console.log(global.branchRelease.substring('/[0-9]+$/'.length))
         let tempnumber = parseInt(global.branchRelease.substring('/[0-9]+$/'.length));
         tempnumber += 1; 
-        //console.log(tempnumber)
         newRelease = global.branchRelease.substring(0,global.branchRelease.lastIndexOf('.')+1)+tempnumber
-        console.log("New Release: "+newRelease)
         grunt.task.run('shell:createTag:'+newRelease)
         .run('shell:pushTag:'+newRelease)
     })
