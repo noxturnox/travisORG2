@@ -283,8 +283,8 @@ module.exports = function (grunt) {
                 command: tag => `git push "https://noxturnox:${process.env.GITHUBTOKEN}@${process.env.REPO}" ${tag}`,
             },
             cleaning: {
-                command: [`git add .`,`git commit -m "cleaning"`,`git checkout ${process.env.TRAVIS_BRANCH}`,
-            `rm stores/**/config.yml arrayTasksDeployFile`, `git branch -D temporal`, `git branch -D temporalDeploy`, `git branch -D shopify`].join(' && ')
+                command: [`git add .`,`git commit --allow-empty -m "cleaning"`,`git checkout ${process.env.TRAVIS_BRANCH}`,
+            `rm stores/**/config.yml arrayTasksDeployFile`, `git branch -D temporal`, `git branch -D shopify`].join(' && ')
             },
             jslint: {
                 command: './node_modules/.bin/eslint "stores/**/**.js"',
@@ -304,7 +304,7 @@ module.exports = function (grunt) {
     })
 
     grunt.registerTask('default', ['checkstatus','getLastReleaseFromRepo','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
-    grunt.registerTask('dev', ['getLastReleaseFromRepo','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme'])
+    grunt.registerTask('dev', ['getLastReleaseFromRepo','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','shell:cleaning',])
     //,'cpCommonFilesToRespectiveStores'  ,'theme_lint'
     grunt.registerTask('checkstatus',function(){
         if(process.env.TRAVIS==undefined || process.env.TRAVIS=='false'){
