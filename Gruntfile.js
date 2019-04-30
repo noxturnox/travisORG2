@@ -274,7 +274,7 @@ module.exports = function (grunt) {
                 }
             },
             createTag: {
-                command: tagname => `git tag ${tagname}`,
+                command: tagname => [`git checkout ${process.env.TRAVIS_BRANCH}`,`git tag -a ${tagname} -m "Release of version ${tagname}`].join(' && '),
                 options: {
                     stdout: false,
                 },
@@ -304,7 +304,7 @@ module.exports = function (grunt) {
     })
 
     grunt.registerTask('default', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
-    grunt.registerTask('dev', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme']) //,'csslint','prettier','js-lint'
+    grunt.registerTask('dev', ['createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme']) //,'csslint','prettier','js-lint'
     //,'cpCommonFilesToRespectiveStores'          al principio 'generateRelease',           al final ,'shell:pushTag'   ,'theme_lint'
     grunt.registerTask('createYAMLFileOnEachShop', function () {
         if(process.env.TRAVIS==undefined || process.env.TRAVIS=='false'){
@@ -502,7 +502,7 @@ module.exports = function (grunt) {
         
     })
     grunt.registerTask('pushNewTag',function(){
-        console.log('Last Release: '+global.branchRelease)
+        grunt.log.writeln(('Last Release: '+global.branchRelease)['magenta'].bold)
         newRelease = '';
         let tempnumber = 0;
         if(global.branchRelease.startsWith('pre')){
@@ -510,11 +510,11 @@ module.exports = function (grunt) {
         }else{
             tempnumber = parseInt(global.branchRelease.substring('/\..*/'.length));
         }
-        console.log('Last digit: '+tempnumber)
+        grunt.log.writeln(('Last digit: '+tempnumber)['magenta'].bold)
         tempnumber += 1; 
-        console.log('Last digit +1:'+tempnumber)
+        grunt.log.writeln(('Last digit +1: '+tempnumber)['magenta'].bold)
         newRelease = global.branchRelease.substring(0,global.branchRelease.lastIndexOf('.')+1)+tempnumber
-        console.log('New Release: '+newRelease)
+        grunt.log.writeln(('New Release: '+newRelease)['magenta'].bold)
         grunt.task.run('shell:createTag:'+newRelease)
         .run('shell:pushTag:'+newRelease)
     })
