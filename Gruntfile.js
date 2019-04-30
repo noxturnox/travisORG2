@@ -303,14 +303,16 @@ module.exports = function (grunt) {
         }
     })
 
-    grunt.registerTask('default', ['getLastReleaseFromRepo','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
+    grunt.registerTask('default', ['checkstatus','getLastReleaseFromRepo','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
     grunt.registerTask('dev', ['createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme'])
     //,'cpCommonFilesToRespectiveStores'  ,'theme_lint'
-    grunt.registerTask('createYAMLFileOnEachShop', function () {
+    grunt.registerTask('checkstatus',function(){
         if(process.env.TRAVIS==undefined || process.env.TRAVIS=='false'){
             grunt.log.writeln('THIS COMMAND MUST BE ONLY USED IN TRAVIS'['red'].bold)
             return false;
         }
+    })
+    grunt.registerTask('createYAMLFileOnEachShop', function () {
         var result
         grunt.log.writeln();
         grunt.log.write('Checking the existence of root file config.yml '['yellow'].bold)
