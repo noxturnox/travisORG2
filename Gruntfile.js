@@ -293,6 +293,12 @@ module.exports = function (grunt) {
                     stdout: false,
                 },
             },
+            cleanLocal: {
+                command: [`git tag | xargs git tag -d`,`git reset --hard HEAD~1`].join(' && '),
+                options: {
+                    stdout: false,
+                },
+            },
             devRelease: {
                 command: [`git checkout ${process.env.TRAVIS_BRANCH} >/dev/null 2>&1`,`git fetch --tags >/dev/null 2>&1`,`git tag | grep pre | tail -1`].join(' && ' ),
                 options: {
