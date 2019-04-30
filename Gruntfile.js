@@ -6,7 +6,12 @@ module.exports = function (grunt) {
     global.storesAsso = [];
     global.arrayTasksDeploy = [];
     global.changed_theme_files = [];
-    global.lastRelease = 0;
+    global.branchRelease = '';
+    function devReleaseLog(error, stdout, stderr, callback){
+        global.branchRelease = stdout;
+        //console.log(global.branchRelease)
+        callback();
+    }
     function jslintlog(error, stdout, stderr, callback){
         if(stdout!=''){
             grunt.log.error();
@@ -17,12 +22,7 @@ module.exports = function (grunt) {
         callback();
     }
     function getLastReleaselog(error, stdout, stderr, callback){
-        global.lastRelease = stdout.substring('/\..*/'.length);
-        let tempnumber = parseInt(global.lastRelease);
-        tempnumber += 1; 
-        global.lastRelease = stdout;
-        global.lastRelease = global.lastRelease.substring(0,global.lastRelease.lastIndexOf('.')+1)+tempnumber
-        grunt.task.run('shell:createTag:'+global.lastRelease)
+        global.branchRelease = stdout
         callback();
     }
     function handleLastCommitDifferences(error, stdout, stderr, callback) {
@@ -210,9 +210,8 @@ module.exports = function (grunt) {
                 },
             },
             temporalBranch: { 
-                command: [`git checkout -b temporal $(git tag | tail -1) >/dev/null 2>&1`,
-                `grunt cpCommonFilesToRespectiveStores`,
-                `./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
+                command: devBranch => [`git checkout -b temporal ${devBranch}`,
+                `grunt cpCommonFilesToRespectiveStores`,`./node_modules/.bin/prettier --check --write "./stores/**" >/dev/null 2>&1`].join(' && '),
                 options: {
                     stdout: false,
                 }
@@ -271,7 +270,7 @@ module.exports = function (grunt) {
             getLastRelease: {
                 command: [`git checkout ${process.env.TRAVIS_BRANCH} >/dev/null 2>&1`,`git fetch --tags >/dev/null 2>&1`, `git tag | tail -1`].join(' && '),
                 options: {
-                    //callback: getLastReleaselog,
+                    callback: getLastReleaselog,
                     stdout: false,
                 }
             },
@@ -282,7 +281,7 @@ module.exports = function (grunt) {
                 },
             },
             pushTag: {
-                command: `git push "https://noxturnox:${process.env.TRAVISTOKEN}@${process.env.REPO}" $(git tag | tail -1)`,
+                command: tag => `git push "https://noxturnox:${process.env.GITHUBTOKEN}@${process.env.REPO}" ${tag}`,
             },
             cleaning: {
                 command: [`git add .`,`git commit -m "cleaning"`,`git checkout ${process.env.TRAVIS_BRANCH}`,
@@ -295,10 +294,17 @@ module.exports = function (grunt) {
                     stdout: false,
                 },
             },
+            devRelease: {
+                command: [`git checkout ${process.env.TRAVIS_BRANCH} >/dev/null 2>&1`,`git fetch --tags >/dev/null 2>&1`,`git tag | grep pre | tail -1`].join(' && ' ),
+                options: {
+                    callback: devReleaseLog,
+                    stdout: false,
+                }
+            },
         }
     })
 
-    grunt.registerTask('default', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning']) 
+    grunt.registerTask('default', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','pushNewTag','shell:cleaning']) 
     grunt.registerTask('dev', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme']) //,'csslint','prettier','js-lint'
     //,'cpCommonFilesToRespectiveStores'          al principio 'generateRelease',           al final ,'shell:pushTag'   ,'theme_lint'
     grunt.registerTask('createYAMLFileOnEachShop', function () {
@@ -403,7 +409,7 @@ module.exports = function (grunt) {
             grunt.log.writeln();
             grunt.log.write(('  Running PRETTIER: '))
         })
-        .run('shell:temporalBranch').then( ()=>{
+        .run('shell:temporalBranch:'+global.branchRelease+' >/dev/null 2>&1').then( ()=>{
             grunt.log.ok();
             grunt.log.write(('  Running JSON-Format: '));
         })
@@ -489,7 +495,25 @@ module.exports = function (grunt) {
     })
     grunt.registerTask('getLastCommitDifferences', 'shell:get_last_commit_differences')
     grunt.registerTask('generateRelease',function(){
-        grunt.task.run('shell:getLastRelease')
+        if(process.env.TRAVIS_BRANCH == 'develop'){
+            grunt.task.run('shell:devRelease')
+        }else {
+            grunt.task.run('shell:getLastRelease')
+        }
+        
+    })
+    grunt.registerTask('pushNewTag',function(){
+        //global.branchRelease = stdout.substring('/\..*/'.length);
+        newRelease = '';
+        //global.branchRelease = 'pre-v0.0.1'
+        //console.log(global.branchRelease.substring('/[0-9]+$/'.length))
+        let tempnumber = parseInt(global.branchRelease.substring('/[0-9]+$/'.length));
+        tempnumber += 1; 
+        //console.log(tempnumber)
+        newRelease = global.branchRelease.substring(0,global.branchRelease.lastIndexOf('.')+1)+tempnumber
+        console.log("New Release: "+newRelease)
+        grunt.task.run('shell:createTag:'+newRelease)
+        .run('shell:pushTag:'+newRelease)
     })
     grunt.registerTask('cpCommonFilesToRespectiveStores',function(){
         var tempYAML = grunt.file.readYAML('config.yml');
