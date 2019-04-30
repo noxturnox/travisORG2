@@ -303,9 +303,9 @@ module.exports = function (grunt) {
         }
     })
 
-    grunt.registerTask('default', ['generateRelease','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
-    grunt.registerTask('dev', ['createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme']) //,'csslint','prettier','js-lint'
-    //,'cpCommonFilesToRespectiveStores'          al principio 'generateRelease',           al final ,'shell:pushTag'   ,'theme_lint'
+    grunt.registerTask('default', ['getLastReleaseFromRepo','createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme','deploy','shell:cleaning','pushNewTag']) 
+    grunt.registerTask('dev', ['createYAMLFileOnEachShop','getLastCommitDifferences','js-lint','csslint','compareStoreTheme'])
+    //,'cpCommonFilesToRespectiveStores'  ,'theme_lint'
     grunt.registerTask('createYAMLFileOnEachShop', function () {
         if(process.env.TRAVIS==undefined || process.env.TRAVIS=='false'){
             grunt.log.writeln('THIS COMMAND MUST BE ONLY USED IN TRAVIS'['red'].bold)
@@ -493,7 +493,7 @@ module.exports = function (grunt) {
         grunt.task.run('prompt:target')
     })
     grunt.registerTask('getLastCommitDifferences', 'shell:get_last_commit_differences')
-    grunt.registerTask('generateRelease',function(){
+    grunt.registerTask('getLastReleaseFromRepo',function(){
         if(process.env.TRAVIS_BRANCH == 'develop'){
             grunt.task.run('shell:devRelease')
         }else {
