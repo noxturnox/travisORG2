@@ -502,10 +502,14 @@ module.exports = function (grunt) {
         
     })
     grunt.registerTask('pushNewTag',function(){
+        console.log('Last Release: '+global.branchRelease)
         newRelease = '';
         let tempnumber = parseInt(global.branchRelease.substring('/[0-9]+$/'.length));
+        console.log('Last digit: '+tempnumber)
         tempnumber += 1; 
+        console.log('Last digit +1:'+tempnumber)
         newRelease = global.branchRelease.substring(0,global.branchRelease.lastIndexOf('.')+1)+tempnumber
+        console.log('New Release: '+newRelease)
         grunt.task.run('shell:createTag:'+newRelease)
         .run('shell:pushTag:'+newRelease)
     })
